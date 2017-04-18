@@ -1,5 +1,15 @@
 # TorPhantom
+## BETA v0.8
 A fork of [TorGhost](https://github.com/susmithHCK/torghost), a little utilitly used to route all traffic through TOR.
+
+Currently depends on macchanger and tor.
+
+This script spoofs your mac address, and then routes all traffic through the TOR network. It is currently a WIP.
+
+TODO:
+Add in arguments for more interfaces other than eth0 and wlan0 (currently hardcoded)
+macOS Support
+More Linux support (currently install script is for Debian based distros only)
 
 ```sh
 chmod +x install.sh
