@@ -7,9 +7,9 @@ Currently depends on macchanger and tor.
 This script spoofs your mac address, and then routes all traffic through the TOR network. It is currently a WIP.
 
 TODO:
-Add in arguments for more interfaces other than eth0 and wlan0 (currently hardcoded)
-macOS Support
-More Linux support (currently install script is for Debian based distros only)
+1. Add in arguments for more interfaces other than eth0 and wlan0 (currently hardcoded)
+2. macOS Support
+3. More Linux support (currently install script is for Debian based distros only)
 
 ```sh
 chmod +x install.sh
