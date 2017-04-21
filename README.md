@@ -6,10 +6,16 @@ Currently depends on macchanger and tor.
 
 This script spoofs your mac address, and then routes all traffic through the TOR network. It is currently a WIP.
 
+## Notice:
+Current macOS version does not route all traffic through TOR, this will be fixed in an update ASAP. Current configuration only routes MOST traffic through TOR via socks5 proxy. Any apps not configured to use this proxy (such as a curl call with no proxy flags) will not go through TOR. Proceed with caution!
+
+**Remember this tool is still in BETA and all risk and activtiy falls back on you (whether the app is in BETA or not)**
+
 TODO:
 1. Add in arguments for more interfaces other than eth0 and wlan0 (currently hardcoded)
 2. Dynamic interfaces for macOS (currently hardcoded for WiFi interface only)
-3. More Linux support (currently install script is for Debian based distros only)
+3. Update macOS version to use ipfw config (current version does not route all traffic)
+4. More Linux support (currently install script is for Debian based distros only)
 
 DONE:
 1. macOS Support
