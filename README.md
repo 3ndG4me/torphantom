@@ -14,7 +14,7 @@ Current macOS version does not route all traffic through TOR, this will be fixed
 TODO:
 1. Add in arguments for more interfaces other than eth0 and wlan0 (currently hardcoded)
 2. Dynamic interfaces for macOS (currently hardcoded for WiFi interface only)
-3. Update macOS version to use ipfw config (current version does not route all traffic)
+3. Update macOS version to use a new firewall config (current version does not route all traffic)
 4. More Linux support (currently install script is for Debian based distros only)
 
 DONE:
