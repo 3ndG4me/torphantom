@@ -16,8 +16,7 @@ If you are aware of another solution to this problem please submit a pull reques
 **Remember this tool is still in BETA and any risks you take or activties performed while using TorPhantom fall back on you (whether the app is in BETA or not)**
 
 TODO:
-1. Add in arguments for more interfaces other than eth0 and wlan0 (currently hardcoded)
-2. Dynamic interfaces for macOS (currently hardcoded for WiFi interface only)
+1. Add in arguments for more interfaces other than eth0 and wlan0 on both macOS and Linux (currently hardcoded)
 3. More Linux support (currently install script is for Debian based distros only)
 
 DONE:
