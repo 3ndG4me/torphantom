@@ -25,10 +25,29 @@ DONE:
 
 
 ## Linux:
+
+#### Debian/Ubuntu:
+
 ```sh
 chmod +x install.sh
 ./install.sh
 ```
+
+#### Arch:
+
+```sh
+chmod +x install-pac.sh
+./install-pac.sh
+```
+
+
+#### RHEL/CentOS/Fedora:
+
+```sh
+chmod +x install-rpm.sh
+./install-rpm.sh
+```
+
 ```sh
   _______         _____  _                 _                  
  |__   __|       |  __ \| |               | |                 
