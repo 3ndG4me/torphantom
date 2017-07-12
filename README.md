@@ -1,5 +1,5 @@
 # TorPhantom
-## BETA v0.8
+## BETA v0.9 (Linux) v0.8 (macOS)
 A fork of [TorGhost](https://github.com/susmithHCK/torghost), a little utilitly used to route all traffic through TOR.
 
 Currently depends on macchanger and tor.
@@ -16,11 +16,12 @@ If you are aware of another solution to this problem please submit a pull reques
 **Remember this tool is still in BETA and any risks you take or activties performed while using TorPhantom fall back on you (whether the app is in BETA or not)**
 
 TODO:
-1. Add in arguments for more interfaces other than eth0 and wlan0 on both macOS and Linux (currently hardcoded)
-3. More Linux support (currently install script is for Debian based distros only)
+1. Add in arguments for more interfaces other than eth0 and wlan0 on both macOS and ~Linux~ (currently hardcoded)
+
 
 DONE:
 1. macOS Support
+2. More Linux support (currently install script is for Debian based distros only)
 
 
 ## Linux:
@@ -39,6 +40,7 @@ chmod +x install.sh
 
 	USAGE:
         torphantom start -----(start torphantom)
+        torphantom start -i <interface(s)> -----(start with macchanger)
         torphantom stop  -----(stop torphantom)
 ```
 
