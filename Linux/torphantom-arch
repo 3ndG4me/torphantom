@@ -1,0 +1,205 @@
+#!/usr/bin/python2
+import sys
+from commands import getoutput
+import time
+import signal
+from urllib2 import urlopen
+import subprocess
+
+class bcolors:
+    BLUE = '\033[94m'
+    GREEN = '\033[92m'
+    RED = '\033[31m'
+    YELLOW = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    BGRED = '\033[41m'
+    WHITE = '\033[37m'
+    CYAN = '\033[36m'
+
+
+def timelog():
+	current_time = time.localtime()
+	ctime = time.strftime('%H:%M:%S', current_time)
+	return "["+ ctime + "]"
+
+def shutdown():
+	print ""
+	print bcolors.BGRED + bcolors.WHITE + timelog() + "[info] shutting down torphantom" + bcolors.ENDC +"\n\n"
+	sys.exit()
+
+
+def sigint_handler(signum, frame):
+    print '\n user interrupt ! shutting down'
+    shutdown()
+
+def logo():
+	subprocess.call(["clear"])
+	print bcolors.CYAN + bcolors.BOLD
+	print """
+  _______         _____  _                 _
+ |__   __|       |  __ \| |               | |
+    | | ___  _ __| |__) | |__   __ _ _ __ | |_ ___  _ __ ___
+    | |/ _ \| '__|  ___/| '_ \ / _` | '_ \| __/ _ \| '_ ` _ \\
+    | | (_) | |  | |    | | | | (_| | | | | || (_) | | | | | |
+    |_|\___/|_|  |_|    |_| |_|\__,_|_| |_|\__\___/|_| |_| |_|
+	v0.9 - 3ndG4me | www.injecti0n.org
+    """
+	print bcolors.ENDC
+
+def usage():
+	logo()
+	print """
+	USAGE:
+        torphantom start -----(start torphantom)
+	torphantom start -i <interface(s)> -----(start with macchanger)
+        torphantom stop  -----(stop torphantom)
+    """
+	sys.exit()
+
+def internet_on():
+
+	while True:
+		try:
+			urlopen('https://check.torproject.org/', timeout=1)
+	        	return True
+		except :
+			continue
+		break
+
+def tor_status():
+		status_message = subprocess.check_output("curl -s https://check.torproject.org/ | cat | grep -m 1 Congratulations | xargs", shell=True)
+		if('Congratulations' in status_message):
+			return True
+		else:
+			return False
+
+def ip():
+	if(internet_on() and tor_status()):
+		ipadd = "Tor is enabled\n" + subprocess.check_output("curl -s https://check.torproject.org/ | cat | grep -m 1 IP | xargs | sed 's/<[^>]*>//g'", shell=True)
+	elif (internet_on() and not tor_status()):
+		ipadd = "Tor is disabled\nYour IP address appears to be: " + subprocess.check_output("curl -s ipinfo.io/ip", shell=True)
+	return ipadd
+
+signal.signal(signal.SIGINT, sigint_handler)
+
+TorrcCfgString = """
+VirtualAddrNetwork 10.0.0.0/10
+AutomapHostsOnResolve 1
+TransPort 9040
+DNSPort 53
+"""
+
+resolvString = "nameserver 127.0.0.1"
+
+Torrc = "/etc/tor/torrc"
+resolv = "/etc/resolv.conf"
+
+
+
+def change_macaddr(interfaces):
+	print timelog()+" Changing MAC Addresses..."
+	for interface in interfaces:
+		print timelog() + bcolors.BLUE + bcolors.BOLD + " Changing: " + interface + bcolors.ENDC
+		subprocess.call(["ifconfig", interface ,"down"])
+		subprocess.call(["macchanger", "-r" , interface])
+		subprocess.call(["ifconfig", interface ,"up"])
+	print timelog()+bcolors.GREEN+" MAC Addresses changed"+bcolors.ENDC
+	print timelog()+" Restarting Network Manager...",
+	subprocess.call(["systemctl", "restart", "NetworkManager"])
+	print bcolors.GREEN+"[done]"+bcolors.ENDC
+
+
+
+
+def start_torphantom():
+
+
+
+	if TorrcCfgString in open(Torrc).read():
+	    print timelog()+" Torrc file already configured"
+	else:
+		with open(Torrc, "a") as myfile:
+			print timelog()+" Configuring torrc file.. ",
+			myfile.write(TorrcCfgString)
+			print bcolors.GREEN+"[done]"+bcolors.ENDC
+	if resolvString in open(resolv).read():
+	    print timelog()+" DNS resolv.conf file already configured"
+	else:
+		with open(resolv, "w") as myfile:
+			print timelog()+" Configuring DNS resolv.conf file.. ",
+			myfile.write(resolvString)
+			print bcolors.GREEN+"[done]"+bcolors.ENDC
+
+	print timelog()+" Starting tor service.. ",
+	subprocess.call(["systemctl", "start", "tor"])
+	print bcolors.GREEN+"[done]"+bcolors.ENDC
+	print timelog()+" setting up iptables rules",
+
+	iptables_rules = """
+	NON_TOR="192.168.1.0/24 192.168.0.0/24"
+	TOR_UID=%s
+	TRANS_PORT="9040"
+	iptables -F
+	iptables -t nat -F
+	iptables -t nat -A OUTPUT -m owner --uid-owner $TOR_UID -j RETURN
+	iptables -t nat -A OUTPUT -p udp --dport 53 -j REDIRECT --to-ports 53
+	for NET in $NON_TOR 127.0.0.0/9 127.128.0.0/10; do
+	 iptables -t nat -A OUTPUT -d $NET -j RETURN
+	done
+	iptables -t nat -A OUTPUT -p tcp --syn -j REDIRECT --to-ports $TRANS_PORT
+	iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+	for NET in $NON_TOR 127.0.0.0/8; do
+	 iptables -A OUTPUT -d $NET -j ACCEPT
+	done
+	iptables -A OUTPUT -m owner --uid-owner $TOR_UID -j ACCEPT
+	iptables -A OUTPUT -j REJECT
+	"""%(getoutput("id -ur tor"))
+
+	subprocess.call(iptables_rules, shell=True)
+	print bcolors.GREEN+"[done]"+bcolors.ENDC
+	print timelog()+" Fetching current status and IP..."
+	print timelog()+" CURRENT STATUS AND IP : "+bcolors.GREEN+ip()+bcolors.ENDC
+
+def stop_torphantom():
+	print bcolors.RED+timelog()+" STOPPING torphantom"+bcolors.ENDC
+	print timelog()+" Flushing iptables, resetting to default",
+	IpFlush = """
+	iptables -P INPUT ACCEPT
+	iptables -P FORWARD ACCEPT
+	iptables -P OUTPUT ACCEPT
+	iptables -t nat -F
+	iptables -t mangle -F
+	iptables -F
+	iptables -X
+	"""
+	subprocess.call(IpFlush, shell=True)
+	print bcolors.GREEN+"[done]"+bcolors.ENDC
+	print timelog()+" Restarting Network manager",
+	subprocess.call(["systemctl", "restart", "NetworkManager"])
+	print bcolors.GREEN+"[done]"+bcolors.ENDC
+	print timelog()+" Fetching current status and IP..."
+	print timelog()+" CURRENT STATUS AND IP : "+bcolors.GREEN+ip()+bcolors.ENDC
+
+arg = sys.argv[1:]
+
+print arg
+
+
+if len(arg) >= 1:
+	if sys.argv[1] == "start":
+		logo()
+		if len(arg) >= 2:
+			if sys.argv[2] == "-i":
+				interfaces = []
+				for interface in sys.argv[3:]:
+					interfaces.append(interface)
+				change_macaddr(interfaces)
+
+		start_torphantom()
+	elif sys.argv[1] == "stop":
+		logo()
+		stop_torphantom()
+else:
+	usage()
