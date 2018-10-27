@@ -1,7 +1,7 @@
 echo "******* TorPhantom Installer ********"
 echo ""
 echo "=====> Installing macchanger "
-git clone https://github.com/3ndG4me/macchanger
+git clone https://github.com/InjectionSoftwareDevelopment/macchanger
 cd macchanger
 sudo chmod +x install.sh
 ./install.sh
