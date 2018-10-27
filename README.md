@@ -55,7 +55,7 @@ chmod +x install-rpm.sh
     | |/ _ \| '__|  ___/| '_ \ / _` | '_ \| __/ _ \| '_ ` _ \
     | | (_) | |  | |    | | | | (_| | | | | || (_) | | | | | |
     |_|\___/|_|  |_|    |_| |_|\__,_|_| |_|\__\___/|_| |_| |_|
-	v0.8 - 3ndG4me | www.injecti0n.org
+	v0.9 - 3ndG4me | www.injecti0n.org
 
 	USAGE:
         torphantom start -----(start torphantom)
@@ -80,5 +80,6 @@ chmod +x install.sh
 
 	USAGE:
         torphantom start -----(start torphantom)
+	torphantom start -i <interface(s)> -----(start with macchanger)
         torphantom stop  -----(stop torphantom)
 ```
