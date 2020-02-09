@@ -105,9 +105,9 @@ def change_macaddr(interfaces):
 	print timelog()+" Changing MAC Addresses..."
 	for interface in interfaces:
 		print timelog() + bcolors.BLUE + bcolors.BOLD + " Changing: " + interface + bcolors.ENDC
-		subprocess.call(["ifconfig", interface ,"down"])
+		subprocess.call(["ip", "link", "set", interface ,"down"])
 		subprocess.call(["macchanger", "-r" , interface])
-		subprocess.call(["ifconfig", interface ,"up"])
+		subprocess.call(["ip", "link", "set", interface ,"up"])
 	print timelog()+bcolors.GREEN+" MAC Addresses changed"+bcolors.ENDC
 	print timelog()+" Restarting Network Manager...",
 	subprocess.call(["systemctl", "restart", "NetworkManager"])
