@@ -59,14 +59,15 @@ def usage():
 	sys.exit()
 
 def internet_on():
-
-	while True:
+	tries = 0
+	while tries < 10:
 		try:
 			urlopen('https://check.torproject.org/', timeout=1)
-	        	return True
+			return True
 		except :
+			tries += 1
 			continue
-		break
+		return False
 
 def tor_status():
 		status_message = subprocess.check_output("curl -s https://check.torproject.org/ | cat | grep -m 1 Congratulations | xargs", shell=True)
@@ -80,6 +81,8 @@ def ip():
 		ipadd = "Tor is enabled\n" + subprocess.check_output("curl -s https://check.torproject.org/ | cat | grep -m 1 IP | xargs | sed 's/<[^>]*>//g'", shell=True)
 	elif (internet_on() and not tor_status()):
 		ipadd = "Tor is disabled\nYour IP address appears to be: " + subprocess.check_output("curl -s ipinfo.io/ip", shell=True)
+	else:
+		ipadd = "Tor is disabled\nYour internet is down..."
 	return ipadd
 
 signal.signal(signal.SIGINT, sigint_handler)
@@ -102,9 +105,9 @@ def change_macaddr(interfaces):
 	print timelog()+" Changing MAC Addresses..."
 	for interface in interfaces:
 		print timelog() + bcolors.BLUE + bcolors.BOLD + " Changing: " + interface + bcolors.ENDC
-		subprocess.call(["ifconfig", interface ,"down"])
+		subprocess.call(["ip", "link", "set", interface ,"down"])
 		subprocess.call(["macchanger", "-r" , interface])
-		subprocess.call(["ifconfig", interface ,"up"])
+		subprocess.call(["ip", "link", "set", interface ,"up"])
 	print timelog()+bcolors.GREEN+" MAC Addresses changed"+bcolors.ENDC
 	print timelog()+" Restarting Network Manager...",
 	subprocess.call(["systemctl", "restart", "NetworkManager"])
@@ -114,9 +117,6 @@ def change_macaddr(interfaces):
 
 
 def start_torphantom():
-
-
-
 	if TorrcCfgString in open(Torrc).read():
 	    print timelog()+" Torrc file already configured"
 	else:
@@ -185,7 +185,6 @@ def stop_torphantom():
 arg = sys.argv[1:]
 
 print arg
-
 
 if len(arg) >= 1:
 	if sys.argv[1] == "start":

@@ -59,14 +59,15 @@ def usage():
 	sys.exit()
 
 def internet_on():
-
-	while True:
+	tries = 0
+	while tries < 10:
 		try:
 			urlopen('https://check.torproject.org/', timeout=1)
-	        	return True
+			return True
 		except :
+			tries += 1
 			continue
-		break
+		return False
 
 def tor_status():
 		status_message = subprocess.check_output("curl -s https://check.torproject.org/ | cat | grep -m 1 Congratulations | xargs", shell=True)
@@ -114,9 +115,6 @@ def change_macaddr(interfaces):
 
 
 def start_torphantom():
-
-
-
 	if TorrcCfgString in open(Torrc).read():
 	    print timelog()+" Torrc file already configured"
 	else:

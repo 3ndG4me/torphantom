@@ -61,14 +61,15 @@ def usage():
 	sys.exit()
 
 def internet_on():
-
-	while True:
+	tries = 0
+	while tries < 10:
 		try:
 			urlopen('https://check.torproject.org/', timeout=1)
-	        	return True
+			return True
 		except :
+			tries += 1
 			continue
-		break
+		return False
 
 def tor_status():
 		status_message = subprocess.check_output("curl --socks5 localhost:9050 --socks5-hostname localhost:9050 -s https://check.torproject.org/ | cat | grep -m 1 Congratulations | xargs", shell=True)
